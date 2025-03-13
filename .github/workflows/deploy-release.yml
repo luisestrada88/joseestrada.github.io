@@ -1,0 +1,12 @@
+name: CI/CD deploy release
+on: 
+  push:
+    branches: [ "deploy-release"]
+  pull_request:
+    branches: [ "deploy-release"]
+jobs:
+  ci_cd_deploy_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo 'hello universe'
