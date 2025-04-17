@@ -1,10 +1,10 @@
 # Mycv
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.0.5.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.0.5. Jose Luis Estrada Torres 
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files. Server is run for docker or firebase.
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files. The server can be run in Docker or Firebase.
 
 ## Code scaffolding
 
