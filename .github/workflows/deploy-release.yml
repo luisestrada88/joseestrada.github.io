@@ -1,12 +1,32 @@
-name: CI/CD deploy release
-on: 
+name: CI/CD deploy master
+
+on:
   push:
-    branches: [ "deploy-release"]
-  pull_request:
-    branches: [ "deploy-release"]
+    branches: ["master"]
+
 jobs:
-  ci_cd_deploy_release:
+  deploy_master:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
-      - uses: actions/checkout@v2
-      - run: echo 'hello universe'
+      - uses: actions/checkout@v3
+
+      - name: build angular, output in dist/mycv
+        run: CI=false npm run build
+
+      - name: show dir
+        run: ls -la dist/mycv/browser
+
+      - name: download & run httpd image
+        run: docker run -d --name serving_base httpd
+
+      - name: docker ps
+        run: docker ps
+
+      - name: cp angular build to container
+        run: docker cp dist/mycv/browser/. serving_base:/usr/local/apache2/htdocs
+
+      - name: list container
+        run: docker exec serving_base ls -la /usr/local/apache2/htdocs
