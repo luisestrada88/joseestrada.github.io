@@ -55,7 +55,7 @@ jobs:
           CI_COMMIT_AUTHOR: adsoft
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
-          git config --global user.email "adsoft@live.com.mx"
+          git config --global user.email "josexxt58@gmail.com"
           git checkout deploy-release     # Asegúrate de estar en la rama correcta
           git add docs
           git commit -m "${{ env.CI_COMMIT_MESSAGE }}" || echo "No changes to commit"
