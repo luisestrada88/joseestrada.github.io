@@ -1,54 +1,47 @@
 name: CI/CD deploy release
-
-on:
+on: 
   push:
-    branches: ["deploy-release"]
-  pull_request:
-    branches: ["deploy-release"]
-
-permissions:
-  contents: write
-
+    branches: [ "deploy-release"]
+  #pull_request:
+    #branches: [ "deploy-release"]
 jobs:
-  ci_cd_deploy_release:
+ ci_cd_deploy_release:
     runs-on: ubuntu-latest
-
+    permissions: 
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+       contents: write
     steps:
-      # 1) Clonar TODO el repo y apuntar a deploy‑release
-      - uses: actions/checkout@v3
+      - run: ls -la
+      - uses: actions/checkout@v2
+      - run: echo 'hello world'
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v1
         with:
-          ref: deploy-release    # ¡clonamos esa rama, no un SHA detached!
-          fetch-depth: 0         # para que traiga todo el historial
+          node-version: 20.x
 
-      # … pasos 2–8 idénticos …
+      - name: install dependencies 
+        run: npm ci
 
-      # 9) Commit & push docs SOBRE LA MISMA RAMA
+      - name: build setup
+        run: npm run build
+
+      - name: list dir
+        run: ls -la dist/mycv/browser
+        
+      - name: copy index.html, css, js
+        run: cp dist/mycv/browser/*.* docs
+        
+      - name: list docs\
+        run: ls -la docs
+        
       - name: GIT commit and push docs
-        env:
-          CI_COMMIT_MESSAGE: save spark results
-          CI_COMMIT_AUTHOR: adsoft
+        env: 
+         CI_COMMIT_MESSAGE: save spark results
+         CI_COMMIT_AUTHOR: 20032024
         run: |
-          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
-          git config --global user.email "adsoft@live.com.mx"
-          git add docs
-          git commit -m "${{ env.CI_COMMIT_MESSAGE }}" || echo "No changes to commit"
-          git push               # ahora sí será un fast‑forward limpio
-
-      - name: Build the custom Docker image
-        run: |
-          docker commit \
-            --change "ENV MODEL_NAME=${{ secrets.MODEL_NAME }}" \
-            serving_base \
-            ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:${{ github.sha }}
-
-      - name: Show Docker images
-        run: docker images
-
-      - name: Docker login
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
-
-      - name: Docker Push
-        run: docker push ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:${{ github.sha }}
+         git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+         git config --global user.email "zS23020596@estudiantes.uv.mx"
+         git add .
+         git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
+         git push origin deploy-release
