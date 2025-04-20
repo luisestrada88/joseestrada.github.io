@@ -7,7 +7,6 @@ on:
     branches: ["deploy-release"]
 
 permissions:
-  # Necesitamos permiso de escritura para hacer commit/push de los docs
   contents: write
 
 jobs:
@@ -49,7 +48,7 @@ jobs:
       - name: list docs
         run: ls -la docs
 
-      # 9) Commit & push de docs/ de vuelta a la rama
+      # 9) Commit & push docs/ de vuelta a la rama
       - name: GIT commit and push docs
         env:
           CI_COMMIT_MESSAGE: save spark results
@@ -57,6 +56,7 @@ jobs:
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "adsoft@live.com.mx"
+          git checkout deploy-release     # Asegúrate de estar en la rama correcta
           git add docs
           git commit -m "${{ env.CI_COMMIT_MESSAGE }}" || echo "No changes to commit"
-          git push
+          git push origin deploy-release
