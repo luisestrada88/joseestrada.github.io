@@ -35,13 +35,15 @@ jobs:
       - name: list docs\
         run: ls -la docs
         
+            # 9) Commit & push de docs/ de vuelta a la rama
       - name: GIT commit and push docs
-        env: 
-         CI_COMMIT_MESSAGE: save spark results
-         CI_COMMIT_AUTHOR: 20032024
+        env:
+          CI_COMMIT_MESSAGE: save spark results
+          CI_COMMIT_AUTHOR: adsoft
         run: |
-         git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
-         git config --global user.email "zS23020596@estudiantes.uv.mx"
-         git add .
-         git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
-         git push origin deploy-release
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "adsoft@live.com.mx"
+          git checkout deploy-release
+          git add docs
+          git commit -m "${{ env.CI_COMMIT_MESSAGE }}" || echo "No changes to commit"
+          git push origin deploy-release
