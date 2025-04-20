@@ -13,20 +13,31 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: build angular, output in dist/mycv
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16' # Ensure the Node.js version matches your project's needs
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Angular CLI
+        run: npm install -g @angular/cli
+
+      - name: Build Angular, output in dist/mycv
         run: CI=false npm run build
 
-      - name: show dir
+      - name: Show directory contents
         run: ls -la dist/mycv/browser
 
-      - name: download & run httpd image
+      - name: Download & run httpd image
         run: docker run -d --name serving_base httpd
 
-      - name: docker ps
+      - name: List running Docker containers
         run: docker ps
 
-      - name: cp angular build to container
+      - name: Copy Angular build to container
         run: docker cp dist/mycv/browser/. serving_base:/usr/local/apache2/htdocs
 
-      - name: list container
+      - name: List container contents
         run: docker exec serving_base ls -la /usr/local/apache2/htdocs
