@@ -14,34 +14,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1) Clonar TODO el repo y apuntar a deploy‑release
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          ref: deploy-release    # ¡clonamos esa rama, no un SHA detached!
+          fetch-depth: 0         # para que traiga todo el historial
 
-      - run: echo 'hello world'
+      # … pasos 2–8 idénticos …
 
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20.x
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Angular (prod)
-        run: npm run build -- --configuration production
-
-      - name: List build output
-        run: ls -la dist/mycv/browser
-
-      - name: Copy build to docs
-        run: |
-          mkdir -p docs
-          cp -R dist/mycv/browser/. docs/
-
-      - name: List docs
-        run: ls -la docs
-
+      # 9) Commit & push docs SOBRE LA MISMA RAMA
       - name: GIT commit and push docs
         env:
           CI_COMMIT_MESSAGE: save spark results
@@ -51,8 +32,7 @@ jobs:
           git config --global user.email "adsoft@live.com.mx"
           git add docs
           git commit -m "${{ env.CI_COMMIT_MESSAGE }}" || echo "No changes to commit"
-          # En vez de 'git push', empujamos HEAD a la rama remota:
-          git push origin HEAD:deploy-release
+          git push               # ahora sí será un fast‑forward limpio
 
       - name: Build the custom Docker image
         run: |
