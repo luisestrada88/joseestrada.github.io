@@ -14,43 +14,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Clonar el repositorio completo
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      # 2) Mensaje de prueba
       - run: echo 'hello world'
 
-      # 3) Instalar Node.js para poder correr npm/ng
       - name: Use Node.js 20.x
         uses: actions/setup-node@v3
         with:
           node-version: 20.x
 
-      # 4) Instalar dependencias de npm
       - name: Install dependencies
         run: npm ci
 
-      # 5) Build de Angular en modo producción
       - name: Build Angular (prod)
         run: npm run build -- --configuration production
 
-      # 6) Verificar carpeta de salida
       - name: List build output
         run: ls -la dist/mycv/browser
 
-      # 7) Copiar el build a docs/
       - name: Copy build to docs
         run: |
           mkdir -p docs
           cp -R dist/mycv/browser/. docs/
 
-      # 8) Listar docs/ para asegurarse de que no está vacío
       - name: List docs
         run: ls -la docs
 
-      # 9) Commit y push de docs/ de vuelta a la rama deploy-release
       - name: GIT commit and push docs
         env:
           CI_COMMIT_MESSAGE: save spark results
@@ -60,28 +51,23 @@ jobs:
           git config --global user.email "adsoft@live.com.mx"
           git add docs
           git commit -m "${{ env.CI_COMMIT_MESSAGE }}" || echo "No changes to commit"
-          git push
+          # En vez de 'git push', empujamos HEAD a la rama remota:
+          git push origin HEAD:deploy-release
 
-      # 10) Construir la imagen Docker a partir del contenedor serving_base
       - name: Build the custom Docker image
         run: docker commit \
           --change "ENV MODEL_NAME ${{ secrets.MODEL_NAME }}" \
           serving_base \
           ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:${{ github.sha }}
 
-      # 11) Mostrar las imágenes Docker locales
       - name: Show Docker images
         run: docker images
 
-      # 12) Loguearse en Docker Hub
       - name: Docker login
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: |
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
+        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
 
-      # 13) Push de la nueva imagen al registry
       - name: Docker Push
         run: docker push ${{ secrets.DOCKER_USER }}/${{ secrets.MODEL_NAME }}:${{ github.sha }}
-
